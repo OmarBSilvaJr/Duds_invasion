@@ -1,0 +1,13 @@
+﻿[MASTER]
+
+optimize-ast=no
+
+extension-pkg-whitelist=pygame
+
+[TYPECHECK]
+
+ignored-modules=pygame
+
+ignored-modules=sys
+
+ignored-classes=pygame
