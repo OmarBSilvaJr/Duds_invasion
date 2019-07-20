@@ -21,26 +21,56 @@ import pygame
 from pygame.sprite import Group
 from settings import Settings
 from ship import Ship
+from moon import Moon
+from button import Button
 import game_functions as gf
+from game_stats import GameStats
+from scoreboard import Scoreboard
 
 def run_game():
     # Inicializa o jogo e cria um objeto para a tela
+    #escolha = int(input("Escolha a Nave: 1 - Guto; 2 - Dudu: "))
     pygame.init()
     di_settings = Settings()
     screen = pygame.display.set_mode((di_settings.screen_width, di_settings.screen_height))
-    pygame.display.set_caption("Duds Invasion x Space Guto                     by Omar Jr")
+    pygame.display.set_caption("""
+            DUDS INVASION X SPACE GUTO                  by Omar Jr                  Pressione 'q' para sair""")
 
-    # Cria uma espaçonave
+    # Cria uma espaçonave, lua, um grupo de projéteis e um grupo de alienígenas
+    """
+    if escolha == 2:
+        nave = 'Figuras/nave0.bmp' #Nave Dudu
+    else:
+        nave = 'Figuras/nave4.bmp' #Default nave Guto
+    """
     ship = Ship(di_settings, screen)
-
-    # Cria um grupo no qual serão armazenados os projéteis
+    moon = Moon(di_settings, screen)
     bullets = Group()
+    aliens = Group()
+    stars = Group()
+    
+    # Cria a frota de alienígenas
+    gf.create_fleet(di_settings, screen, ship, aliens)
+
+    # Cria um céu estrelado
+    gf.create_sky(di_settings, screen, stars)
+
+    # Cria o botão Play
+    play_button = Button(di_settings, screen, "Jogar")
+
+    # Cria uma instância para armazenar estatísticas do jogo e cria painel de pontuação.
+    stats = GameStats(di_settings)
+    sb = Scoreboard(di_settings, screen, stats)
         
     # Inicia o laço principal do jogo
     while True:
-        gf.check_events(di_settings, screen, ship, bullets)
-        ship.update()
-        gf.update_bullets(bullets)
-        gf.update_screen(di_settings, screen, ship, bullets)
+        gf.check_events(di_settings, screen, stats, sb, play_button, ship, aliens, bullets)
+        if stats.game_active:
+            ship.update()
+            gf.update_bullets(di_settings, screen, stats, sb, ship, aliens, bullets)
+            gf.update_aliens(di_settings, stats, screen, ship, aliens, bullets)
+
+        #moon.blitme()
+        gf.update_screen(di_settings, screen, stats, sb, ship, aliens, bullets, moon, stars, play_button)
 
 run_game()
